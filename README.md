@@ -1,4 +1,4 @@
-pyatomiadns
+pyatomiadns python3
 ===========
 
 Python Api to atomiadns
@@ -12,7 +12,7 @@ fork from https://github.com/sejo/pyatomiadns
 add client.py support python replace urllib
 
 for use example:
-
+```
 import json
 from client3 import AtomiaClient
 
@@ -134,7 +134,7 @@ print(remove_recordtest("test.com","@","A"))
 
 #print(add_zone("test2.com"))
 
-
+```
 
 
 
