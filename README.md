@@ -9,7 +9,7 @@ This is work in progress.
 
 fork from https://github.com/sejo/pyatomiadns
 
-add client.py support python replace urllib
+add client.py support python3 replace urllib
 
 for use example:
 ```
