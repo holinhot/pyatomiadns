@@ -1,5 +1,7 @@
 import json
-import urllib2
+from urllib.request import Request, urlopen
+
+
 
 
 class AtomiaClient():
@@ -21,51 +23,51 @@ class AtomiaClient():
         self.password = password
 
     def request(self, method, data):
-        req = urllib2.Request(url=self.url + "/" + method)
+        req = Request(url=self.url + "/" + method)
         req.add_header('X-Auth-Username', self.email)
         req.add_header('X-Auth-Password', self.password)
-        req.add_data(data)
+        req.data = data.encode()
 
         try:
-            response = urllib2.urlopen(req)
-            return response.read()
-        except urllib2.URLError, e:
-            return e.read()
+            response = urlopen(req).read().decode()
+            return response
+        except Exception as e:
+            return e
 
     def process_response(self, response):
         return response
-    
+
     def GetLabels(self, zone):
         """GetLabels returns all the labels for a certain zone.
 
 :param zone: `str` zone (example.org, sejo-it.be,...)
         """
-        arguments = [zone,]
+        arguments = [zone, ]
         data = json.dumps(arguments)
         response = self.request("GetLabels", data)
         return self.process_response(response)
-    
+
     def DeleteZone(self, zone):
         """Deletes a zone from the database.
 
 :param zone: `str` the name of the zone
         """
-        arguments = [zone,]
+        arguments = [zone, ]
         data = json.dumps(arguments)
         response = self.request("DeleteZone", data)
         return self.process_response(response)
-    
+
     def EditAccount(self, email, password):
         """Allows one to change the password of ones account
 
 :param email: `str` email of the account to change
-:param password: `str` new password 
+:param password: `str` new password
         """
-        arguments = [email,password,]
+        arguments = [email, password, ]
         data = json.dumps(arguments)
         response = self.request("EditAccount", data)
         return self.process_response(response)
-    
+
     def AddDNSSECKey(self, algorithm, keysize, keytype, activated):
         """Adds a DNSSEC key to the database.
 default algorithm:  RSASHA256 for KSK use keysize 2048, for ZSK use 1024
@@ -75,11 +77,11 @@ default algorithm:  RSASHA256 for KSK use keysize 2048, for ZSK use 1024
 :param keytype: `str` KSK or ZSK
 :param activated: `str` yes or no
         """
-        arguments = [algorithm,keysize,keytype,activated,]
+        arguments = [algorithm, keysize, keytype, activated, ]
         data = json.dumps(arguments)
         response = self.request("AddDNSSECKey", data)
         return self.process_response(response)
-    
+
     def ReloadAllZones(self):
         """Mark all zones in the database as changed.
         """
@@ -87,17 +89,17 @@ default algorithm:  RSASHA256 for KSK use keysize 2048, for ZSK use 1024
         data = json.dumps(arguments)
         response = self.request("ReloadAllZones", data)
         return self.process_response(response)
-    
+
     def AddNameserverGroup(self, groupname):
         """Add a nameserver group.
 
-:param groupname: `str` name of the group you wish to add 
+:param groupname: `str` name of the group you wish to add
         """
-        arguments = [groupname,]
+        arguments = [groupname, ]
         data = json.dumps(arguments)
         response = self.request("AddNameserverGroup", data)
         return self.process_response(response)
-    
+
     def AddDnsRecords(self, zone, records):
         """Adds a list of records to a zone.
 
@@ -117,11 +119,11 @@ default algorithm:  RSASHA256 for KSK use keysize 2048, for ZSK use 1024
  :param records: `list` list of dicts containing the records'
 
         """
-        arguments = [zone,records,]
+        arguments = [zone, records, ]
         data = json.dumps(arguments)
         response = self.request("AddDnsRecords", data)
         return self.process_response(response)
-    
+
     def Noop(self):
         """Noop command used to authenticate
         """
@@ -129,18 +131,18 @@ default algorithm:  RSASHA256 for KSK use keysize 2048, for ZSK use 1024
         data = json.dumps(arguments)
         response = self.request("Noop", data)
         return self.process_response(response)
-    
+
     def EditDnsRecords(self, zone, records):
         """Edits the records for a certain label
 
 :param zone: `str` zone name
-:param records: `list` for format see AddDnsRecords 
+:param records: `list` for format see AddDnsRecords
         """
-        arguments = [zone,records,]
+        arguments = [zone, records, ]
         data = json.dumps(arguments)
         response = self.request("EditDnsRecords", data)
         return self.process_response(response)
-    
+
     def DeleteDnsRecords(self, zone, records):
         """Removes the given records.
 
@@ -153,11 +155,11 @@ One should only provide the labels in a following format
 :param records: `list` of `dict` containing only the label
 
         """
-        arguments = [zone,records,]
+        arguments = [zone, records, ]
         data = json.dumps(arguments)
         response = self.request("DeleteDnsRecords", data)
         return self.process_response(response)
-    
+
     def GetAllZones(self):
         """GetAllZones returns all the zone names that are defined. This is an ADMIN only method
         """
@@ -165,7 +167,7 @@ One should only provide the labels in a following format
         data = json.dumps(arguments)
         response = self.request("GetAllZones", data)
         return self.process_response(response)
-    
+
     def EditZone(self, zonename, zonettl, mname, rname, refresh, retry, expire, minimum, nameservers, nameservergroup):
         """Edits a zone. This is only for completeness, and could be done by editing the SOA and NS-records directly as well.
 
@@ -178,97 +180,97 @@ One should only provide the labels in a following format
 :param expire: `int` the SOA expire field
 :param minimum: `int` the SOA minimum field
 :param nameservers: `str` a string of the hostnames of the nameservers for the zone comma separated within brackets (["dns1.example.org","dns2.example.org"])
-:param nameservergroup: `str` the nameserver group that should host the zone 
+:param nameservergroup: `str` the nameserver group that should host the zone
         """
-        arguments = [zonename,zonettl,mname,rname,refresh,retry,expire,minimum,nameservers,nameservergroup,]
+        arguments = [zonename, zonettl, mname, rname, refresh, retry, expire, minimum, nameservers, nameservergroup, ]
         data = json.dumps(arguments)
         response = self.request("EditZone", data)
         return self.process_response(response)
-    
+
     def RestoreZoneBinary(self, zone, nameservergroup, data):
         """Restores the zone
 
 :param zone: `str` zone name
 :param nameservergroup: `str` name of the nameserver group
-:param data: `str` data to restore 
+:param data: `str` data to restore
         """
-        arguments = [zone,nameservergroup,data,]
+        arguments = [zone, nameservergroup, data, ]
         data = json.dumps(arguments)
         response = self.request("RestoreZoneBinary", data)
         return self.process_response(response)
-    
+
     def DeleteAccount(self, email):
         """Removes a soap account
 
 :param email: `str` email of the account
         """
-        arguments = [email,]
+        arguments = [email, ]
         data = json.dumps(arguments)
         response = self.request("DeleteAccount", data)
         return self.process_response(response)
-    
+
     def GetNameserver(self, nameserver):
         """Gets the group name that a nameserver is configured as a subscriber for.
 
 :param nameserver: `str` the servername to get information for
         """
-        arguments = [nameserver,]
+        arguments = [nameserver, ]
         data = json.dumps(arguments)
         response = self.request("GetNameserver", data)
         return self.process_response(response)
-    
+
     def AddNameserver(self, nameserver, nameservergroup):
         """Add a nameserver as a subscriber of changes to the data set in this server.
 
 :param nameserver: `str` the servername to add as a subscriber
 :param nameservergroup: `str` the nameserver group that this nameserver should subscribe to changes for
         """
-        arguments = [nameserver,nameservergroup,]
+        arguments = [nameserver, nameservergroup, ]
         data = json.dumps(arguments)
         response = self.request("AddNameserver", data)
         return self.process_response(response)
-    
+
     def DeleteNameServerGroup(self, groupname):
         """Delete a nameserver group.
 
 :param groupname: `str` name of the group you wish to delete
         """
-        arguments = [groupname,]
+        arguments = [groupname, ]
         data = json.dumps(arguments)
         response = self.request("DeleteNameServerGroup", data)
         return self.process_response(response)
-    
+
     def GetZoneBinary(self, zone):
         """Gets the binary data for the zone, this can be used to restore zones
 
-:param zone: `str` zone name 
+:param zone: `str` zone name
         """
-        arguments = [zone,]
+        arguments = [zone, ]
         data = json.dumps(arguments)
         response = self.request("GetZoneBinary", data)
         return self.process_response(response)
-    
+
     def DeleteNameserver(self, nameserver):
         """Remove a nameserver as a subscriber of changes to the data set in this server.
 
 :param nameserver: `str` the servername to remove as a subscriber
         """
-        arguments = [nameserver,]
+        arguments = [nameserver, ]
         data = json.dumps(arguments)
         response = self.request("DeleteNameserver", data)
         return self.process_response(response)
-    
+
     def AddAccount(self, email, password_soap):
         """Adds an account for soap
 
 :param email: `str` email used as login
-:param paswword_soap: `str` password for the user 
+:param paswword_soap: `str` password for the user
         """
-        arguments = [email,password_soap,]
+        arguments = [email, password_soap, ]
         data = json.dumps(arguments)
         response = self.request("AddAccount", data)
         return self.process_response(response)
-    
+
     def AddZone(self, zonename, zonettl, mname, rname, refresh, retry, expire, minimum, nameservers, nameservergroup):
         """Add a zone to the Atomia DNS master database.
 
@@ -281,41 +283,40 @@ One should only provide the labels in a following format
 :param expire: `int` the SOA expire field
 :param minimum: `int` the SOA minimum field
 :param nameservers: `str` a string of the hostnames of the nameservers for the zone comma separated within brackets (["dns1.example.org","dns2.example.org"])
-:param nameservergroup: `str` the nameserver group that should host the zone 
+:param nameservergroup: `str` the nameserver group that should host the zone
         """
-        arguments = [zonename,zonettl,mname,rname,refresh,retry,expire,minimum,nameservers,nameservergroup,]
+        arguments = [zonename, zonettl, mname, rname, refresh, retry, expire, minimum, nameservers, nameservergroup, ]
         data = json.dumps(arguments)
         response = self.request("AddZone", data)
         return self.process_response(response)
-    
+
     def FindZones(self, email, pattern, count, offset):
         """ Finds zones according to the pattern
 
 :param email: `str` email of the account
 :param pattern: `str` the pattern to search for with SQL LIKE semantics
 :param count: `int` the max number of zones to return
-:param offset: `int` the offset of the first zone to return 
+:param offset: `int` the offset of the first zone to return
         """
-        arguments = [email,pattern,count,offset,]
+        arguments = [email, pattern, count, offset, ]
         data = json.dumps(arguments)
         response = self.request("FindZones", data)
         return self.process_response(response)
-    
+
     def GetDnsRecords(self, zone, label):
         """GetRecord will fetch full record information for zone and label given
         """
-        arguments = [zone,label,]
+        arguments = [zone, label, ]
         data = json.dumps(arguments)
         response = self.request("GetDnsRecords", data)
         return self.process_response(response)
-    
+
     def GetZone(self, zone):
         """GetZone returns the complete zone info with all records
 
 :param zone: `str` zone (example.org, sejo-it.be,...)
         """
-        arguments = [zone,]
+        arguments = [zone, ]
         data = json.dumps(arguments)
         response = self.request("GetZone", data)
         return self.process_response(response)
-    
